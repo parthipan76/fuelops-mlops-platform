@@ -1,6 +1,3 @@
-﻿# Purpose: FuelOps GitLab CI/CD Pipeline  6 stages
-# Day 10 additions: retry logic, timeouts, better error handling
-
 stages:
   - lint
   - test
@@ -10,7 +7,6 @@ stages:
   - deploy-production
 
 variables:
-  PYTHON_VERSION: "3.11"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   DOCKER_IMAGE: "$ACR_LOGIN_SERVER/fuelops-api"
 
@@ -32,9 +28,7 @@ lint:
   before_script:
     - pip install flake8 black --quiet
   script:
-    - echo "Running flake8..."
     - flake8 src/ --max-line-length=120 --exclude=__pycache__
-    - echo "Running black check..."
     - black --check src/ --line-length=120
   rules:
     - if: "$CI_PIPELINE_SOURCE == 'push'"
@@ -46,7 +40,6 @@ unit-test:
   before_script:
     - pip install fastapi uvicorn pydantic pandas numpy prometheus-client python-multipart httpx pytest pytest-cov --quiet
   script:
-    - echo "Running unit tests..."
     - pytest tests/unit/ -v --cov=src --cov-report=term --cov-report=xml --cov-fail-under=70
   coverage: '/TOTAL.*\s+(\d+%)$/'
   artifacts:
@@ -65,7 +58,6 @@ integration-test:
   before_script:
     - pip install fastapi uvicorn pydantic pandas numpy prometheus-client python-multipart httpx pytest --quiet
   script:
-    - echo "Running integration tests..."
     - pytest tests/integration/ -v
   rules:
     - if: "$CI_COMMIT_BRANCH == 'main'"
@@ -79,19 +71,15 @@ docker-build:
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
   before_script:
-    - docker info
-    - apk add --no-cache python3 py3-pip curl bash
+    - apk add --no-cache python3 py3-pip bash
     - pip3 install azure-cli --quiet --break-system-packages
+    - docker info
   script:
-    - echo "Logging into Azure..."
     - az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
     - az acr login --name fuelopsacrdev
-    - echo "Building Docker image..."
     - docker build -t ${DOCKER_IMAGE}:${CI_COMMIT_SHA} -t ${DOCKER_IMAGE}:latest -f docker/Dockerfile src/inference/
-    - echo "Pushing to ACR..."
     - docker push ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
     - docker push ${DOCKER_IMAGE}:latest
-    - echo "Image pushed: ${CI_COMMIT_SHA}"
   rules:
     - if: "$CI_COMMIT_BRANCH == 'main'"
 
@@ -102,12 +90,9 @@ deploy-staging:
   before_script:
     - az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
   script:
-    - echo "Deploying to staging..."
     - az containerapp update --name fuelops-api-dev --resource-group rg-fuelops-dev --image ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
-    - echo "Verifying deployment..."
     - sleep 15
     - az containerapp show --name fuelops-api-dev --resource-group rg-fuelops-dev --query "properties.provisioningState" -o tsv
-    - echo "Staging deploy complete"
   environment:
     name: staging
     url: https://fuelops-api-dev.delightfulhill-d5055901.eastus.azurecontainerapps.io
@@ -121,9 +106,7 @@ deploy-production:
   before_script:
     - az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
   script:
-    - echo "Deploying to production..."
     - az containerapp update --name fuelops-api-dev --resource-group rg-fuelops-dev --image ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
-    - echo "Production deploy complete"
   environment:
     name: production
     url: https://fuelops-api-dev.delightfulhill-d5055901.eastus.azurecontainerapps.io

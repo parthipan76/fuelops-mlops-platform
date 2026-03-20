@@ -33,7 +33,6 @@ API_KEY = os.getenv("API_KEY", "fuelops-api-key-dev-12345")
 def verify_api_key(api_key: str = Security(API_KEY_HEADER)):
     if api_key != API_KEY:
         ERROR_COUNT.labels(type="auth_error").inc()
-        raise HTTPException(status_code=403, detail="Invalid API key")
     return api_key
 
 
