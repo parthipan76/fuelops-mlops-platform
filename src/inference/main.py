@@ -1,4 +1,4 @@
-﻿# Purpose: FuelOps inference API  serves fuel price predictions via REST
+# Purpose: FuelOps inference API  serves fuel price predictions via REST
 # Inputs:  POST /predict -> { cost, competitor_price, volume, market, fuel_type, store_id }
 # Outputs: { predicted_price, confidence_interval, model_version }
 # Author:  Parthipan S
@@ -19,13 +19,11 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="FuelOps Inference API", version="1.0.0")
 
-# --- Prometheus metrics ---
 REQUEST_LATENCY = Histogram("request_latency_seconds", "Request latency in seconds", ["endpoint"])
 PREDICTION_COUNT = Counter("prediction_count_total", "Total number of predictions served", ["market", "fuel_type"])
 ERROR_COUNT = Counter("error_count_total", "Total number of errors", ["type"])
 MODEL_INFO = Info("model_info", "Current model information")
 
-# --- Auth ---
 API_KEY_HEADER = APIKeyHeader(name="X-API-Key", auto_error=False)
 API_KEY = os.getenv("API_KEY", "fuelops-api-key-dev-12345")
 
@@ -33,10 +31,10 @@ API_KEY = os.getenv("API_KEY", "fuelops-api-key-dev-12345")
 def verify_api_key(api_key: str = Security(API_KEY_HEADER)):
     if api_key != API_KEY:
         ERROR_COUNT.labels(type="auth_error").inc()
+        raise HTTPException(status_code=403, detail="Invalid API key")
     return api_key
 
 
-# --- Model loading ---
 model = None
 model_version = "mock-v1.0"
 
@@ -60,7 +58,6 @@ def load_model():
     MODEL_INFO.info({"version": model_version, "type": "mlflow" if model else "mock"})
 
 
-# --- Request/Response schemas ---
 class PredictRequest(BaseModel):
     cost: float
     competitor_price: float
@@ -92,7 +89,6 @@ class PredictResponse(BaseModel):
     fuel_type: str
 
 
-# --- Mock prediction ---
 def mock_predict(request: PredictRequest) -> float:
     base = request.cost * 1.15
     competitor_adjustment = (request.competitor_price - base) * 0.3
@@ -101,7 +97,6 @@ def mock_predict(request: PredictRequest) -> float:
     return round((base + competitor_adjustment) * market_multiplier * fuel_multiplier, 4)
 
 
-# --- Endpoints ---
 @app.get("/health")
 def health():
     return {
@@ -147,4 +142,3 @@ def predict(request: PredictRequest, api_key: str = Depends(verify_api_key)):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         REQUEST_LATENCY.labels(endpoint="predict").observe(time.time() - start)
-
