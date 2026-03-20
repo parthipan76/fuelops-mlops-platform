@@ -1,4 +1,5 @@
 # Purpose: FuelOps GitLab CI/CD Pipeline  6 stages
+# Day 10 additions: retry logic, timeouts, better error handling
 
 stages:
   - lint
@@ -17,9 +18,17 @@ cache:
   paths:
     - .cache/pip
 
+default:
+  retry:
+    max: 1
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
 lint:
   stage: lint
   image: python:3.11-slim
+  timeout: 5 minutes
   before_script:
     - pip install flake8 black --quiet
   script:
@@ -33,6 +42,7 @@ lint:
 unit-test:
   stage: test
   image: python:3.11-slim
+  timeout: 10 minutes
   before_script:
     - pip install fastapi uvicorn pydantic pandas numpy prometheus-client python-multipart httpx pytest pytest-cov --quiet
   script:
@@ -51,6 +61,7 @@ unit-test:
 integration-test:
   stage: integration
   image: python:3.11-slim
+  timeout: 10 minutes
   before_script:
     - pip install fastapi uvicorn pydantic pandas numpy prometheus-client python-multipart httpx pytest --quiet
   script:
@@ -62,6 +73,7 @@ integration-test:
 docker-build:
   stage: build
   image: docker:24-cli
+  timeout: 20 minutes
   services:
     - docker:24-dind
   variables:
@@ -69,7 +81,6 @@ docker-build:
   before_script:
     - docker info
     - apk add --no-cache python3 py3-pip curl bash
-    - curl -sL https://aka.ms/InstallAzureCLIDeb > /tmp/install_az.sh || true
     - pip3 install azure-cli --quiet --break-system-packages
   script:
     - echo "Logging into Azure..."
@@ -80,18 +91,22 @@ docker-build:
     - echo "Pushing to ACR..."
     - docker push ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
     - docker push ${DOCKER_IMAGE}:latest
-    - echo "Image pushed successfully"
+    - echo "Image pushed: ${CI_COMMIT_SHA}"
   rules:
     - if: "$CI_COMMIT_BRANCH == 'main'"
 
 deploy-staging:
   stage: deploy-staging
   image: mcr.microsoft.com/azure-cli:latest
+  timeout: 10 minutes
   before_script:
     - az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
   script:
     - echo "Deploying to staging..."
     - az containerapp update --name fuelops-api-dev --resource-group rg-fuelops-dev --image ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
+    - echo "Verifying deployment..."
+    - sleep 15
+    - az containerapp show --name fuelops-api-dev --resource-group rg-fuelops-dev --query "properties.provisioningState" -o tsv
     - echo "Staging deploy complete"
   environment:
     name: staging
@@ -102,6 +117,7 @@ deploy-staging:
 deploy-production:
   stage: deploy-production
   image: mcr.microsoft.com/azure-cli:latest
+  timeout: 10 minutes
   before_script:
     - az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
   script:

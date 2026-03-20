@@ -148,3 +148,5 @@ def predict(request: PredictRequest, api_key: str = Depends(verify_api_key)):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         REQUEST_LATENCY.labels(endpoint="predict").observe(time.time() - start)
+
+# this_is_a_very_long_comment_that_exceeds_the_120_character_limit_set_in_our_flake8_configuration_and_should_cause_a_failure_in_ci
