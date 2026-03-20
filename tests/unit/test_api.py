@@ -68,3 +68,7 @@ def test_mock_predict_logic():
     price = mock_predict(req)
     assert price > 0
     assert 3.0 < price < 6.0  # sanity bounds for fuel price
+
+
+def test_intentional_failure():
+    assert 1 == 2, 'intentional failure for CI/CD practice'
