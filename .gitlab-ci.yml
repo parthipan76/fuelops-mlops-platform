@@ -93,6 +93,10 @@ deploy-staging:
     - az containerapp update --name fuelops-api-dev --resource-group rg-fuelops-dev --image ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
     - sleep 15
     - az containerapp show --name fuelops-api-dev --resource-group rg-fuelops-dev --query "properties.provisioningState" -o tsv
+    - |
+      curl -s -X POST "$SLACK_WEBHOOK_URL" \
+        -H "Content-Type: application/json" \
+        -d "{\"text\":\" FuelOps staging deployed successfully\nCommit: ${CI_COMMIT_SHA:0:8}\nBranch: ${CI_COMMIT_BRANCH}\nPipeline: ${CI_PIPELINE_URL}\"}"
   environment:
     name: staging
     url: https://fuelops-api-dev.delightfulhill-d5055901.eastus.azurecontainerapps.io
@@ -107,6 +111,10 @@ deploy-production:
     - az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
   script:
     - az containerapp update --name fuelops-api-dev --resource-group rg-fuelops-dev --image ${DOCKER_IMAGE}:${CI_COMMIT_SHA}
+    - |
+      curl -s -X POST "$SLACK_WEBHOOK_URL" \
+        -H "Content-Type: application/json" \
+        -d "{\"text\":\" FuelOps PRODUCTION deployed\nCommit: ${CI_COMMIT_SHA:0:8}\nPipeline: ${CI_PIPELINE_URL}\"}"
   environment:
     name: production
     url: https://fuelops-api-dev.delightfulhill-d5055901.eastus.azurecontainerapps.io
