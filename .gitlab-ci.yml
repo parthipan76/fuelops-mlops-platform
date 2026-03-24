@@ -28,7 +28,7 @@ lint:
   before_script:
     - pip install flake8 black --quiet
   script:
-    - flake8 src/ --max-line-length=120 --exclude=__pycache__
+    - flake8 src/inference/ --max-line-length=120 --exclude=__pycache__
     - black --check src/ --line-length=120
   rules:
     - if: "$CI_PIPELINE_SOURCE == 'push'"

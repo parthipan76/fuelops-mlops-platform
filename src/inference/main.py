@@ -142,7 +142,6 @@ def predict(request: PredictRequest, api_key: str = Depends(verify_api_key)):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         REQUEST_LATENCY.labels(endpoint="predict").observe(time.time() - start)
-
 @app.get("/version")
 def version():
     """Returns build metadata  added Day 22 integration test."""
