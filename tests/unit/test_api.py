@@ -1,4 +1,4 @@
-﻿# Purpose: Unit tests for FuelOps inference API
+# Purpose: Unit tests for FuelOps inference API
 # Tests:   health endpoint, predict endpoint, mock model logic, auth
 
 from fastapi.testclient import TestClient
@@ -70,3 +70,12 @@ def test_mock_predict_logic():
     assert 3.0 < price < 6.0  # sanity bounds for fuel price
 
 
+
+def test_version_endpoint():
+    """Test /version endpoint returns build metadata."""
+    response = client.get("/version")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["build"] == "day22-integration-test"
+    assert "EST" in data["markets"]
+    assert "/predict" in data["endpoints"]
