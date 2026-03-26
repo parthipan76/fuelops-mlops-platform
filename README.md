@@ -1,7 +1,7 @@
 # FuelOps MLOps Platform
 
 Production-grade MLOps platform for fuel price prediction across 4 US markets (EST/CST/MST/PST).
-Built as pre-employment preparation for 7-Eleven MLOps Engineer role (April 13, 2026).
+Built for 7-Eleven.
 
 ## Overview
 
