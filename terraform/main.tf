@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "~> 4.0"
     }
   }
   required_version = ">= 1.5.0"
@@ -37,7 +37,7 @@ resource "azurerm_key_vault" "main" {
   access_policy {
     tenant_id          = data.azurerm_client_config.current.tenant_id
     object_id          = data.azurerm_client_config.current.object_id
-    secret_permissions = ["Get", "List", "Set", "Delete", "Purge"]
+    secret_permissions = ["Get", "List", "Set", "Delete", "Purge", "Recover"]
   }
   tags = var.common_tags
 }

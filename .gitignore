@@ -1,28 +1,37 @@
-﻿# Terraform
-terraform/environments/dev.tfvars
-terraform/environments/staging.tfvars
-terraform/environments/prod.tfvars
-*.tfplan
-tfplan
-.terraform/
-*.tfstate
-*.tfstate.backup
-.terraform.lock.hcl
+# Airflow logs
+airflow/logs/
 
 # Python
 __pycache__/
 *.pyc
 *.pyo
-.env
-venv/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.coverage
+coverage.xml
 
-# Docker
-*.tar
+# Terraform
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform/
+.terraform.lock.hcl
+
+# Environment
+.env
+*.env
+venv/
+.venv/
 
 # OS
 .DS_Store
 Thumbs.db
 
-.coverage
-coverage.xml
-htmlcov/
+# Docker
+*.tar
+
+# IDE
+.vscode/
+.idea/

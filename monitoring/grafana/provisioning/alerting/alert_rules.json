@@ -1,0 +1,148 @@
+{
+  "apiVersion": 1,
+  "groups": [
+    {
+      "orgId": 1,
+      "name": "FuelOps Alerts",
+      "folder": "FuelOps",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "fuelops-api-down",
+          "title": "API Down",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {"from": 300, "to": 0},
+              "datasourceUid": "PBFA97CFB590B2093",
+              "model": {
+                "expr": "up{job=\"fuelops-api\"}",
+                "intervalMs": 1000,
+                "maxDataPoints": 43200,
+                "refId": "A"
+              }
+            },
+            {
+              "refId": "C",
+              "queryType": "",
+              "relativeTimeRange": {"from": 0, "to": 0},
+              "datasourceUid": "__expr__",
+              "model": {
+                "conditions": [{"evaluator": {"params": [1], "type": "lt"}, "operator": {"type": "and"}, "query": {"params": ["A"]}, "reducer": {"params": [], "type": "last"}, "type": "query"}],
+                "dataSource": {"type": "__expr__", "uid": "__expr__"},
+                "expression": "A",
+                "hide": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200,
+                "refId": "C",
+                "type": "classic_conditions"
+              }
+            }
+          ],
+          "noDataState": "Alerting",
+          "execErrState": "Alerting",
+          "for": "1m",
+          "annotations": {
+            "summary": "FuelOps API is DOWN",
+            "description": "The FastAPI inference service has been unreachable for more than 1 minute."
+          },
+          "labels": {"severity": "critical", "team": "fuelops"},
+          "isPaused": false,
+          "notification_settings": {"receiver": "FuelOps Slack"}
+        },
+        {
+          "uid": "fuelops-high-latency",
+          "title": "High p95 Latency",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {"from": 300, "to": 0},
+              "datasourceUid": "PBFA97CFB590B2093",
+              "model": {
+                "expr": "histogram_quantile(0.95, rate(request_latency_seconds_bucket[5m]))",
+                "intervalMs": 1000,
+                "maxDataPoints": 43200,
+                "refId": "A"
+              }
+            },
+            {
+              "refId": "C",
+              "queryType": "",
+              "relativeTimeRange": {"from": 0, "to": 0},
+              "datasourceUid": "__expr__",
+              "model": {
+                "conditions": [{"evaluator": {"params": [0.5], "type": "gt"}, "operator": {"type": "and"}, "query": {"params": ["A"]}, "reducer": {"params": [], "type": "last"}, "type": "query"}],
+                "dataSource": {"type": "__expr__", "uid": "__expr__"},
+                "expression": "A",
+                "hide": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200,
+                "refId": "C",
+                "type": "classic_conditions"
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Alerting",
+          "for": "2m",
+          "annotations": {
+            "summary": "p95 latency above 500ms",
+            "description": "API p95 response time has exceeded 500ms threshold for 2 minutes."
+          },
+          "labels": {"severity": "warning", "team": "fuelops"},
+          "isPaused": false,
+          "notification_settings": {"receiver": "FuelOps Slack"}
+        },
+        {
+          "uid": "fuelops-high-errors",
+          "title": "High Error Rate",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {"from": 300, "to": 0},
+              "datasourceUid": "PBFA97CFB590B2093",
+              "model": {
+                "expr": "sum(rate(error_count_total[5m])) or vector(0)",
+                "intervalMs": 1000,
+                "maxDataPoints": 43200,
+                "refId": "A"
+              }
+            },
+            {
+              "refId": "C",
+              "queryType": "",
+              "relativeTimeRange": {"from": 0, "to": 0},
+              "datasourceUid": "__expr__",
+              "model": {
+                "conditions": [{"evaluator": {"params": [0.05], "type": "gt"}, "operator": {"type": "and"}, "query": {"params": ["A"]}, "reducer": {"params": [], "type": "last"}, "type": "query"}],
+                "dataSource": {"type": "__expr__", "uid": "__expr__"},
+                "expression": "A",
+                "hide": false,
+                "intervalMs": 1000,
+                "maxDataPoints": 43200,
+                "refId": "C",
+                "type": "classic_conditions"
+              }
+            }
+          ],
+          "noDataState": "OK",
+          "execErrState": "Alerting",
+          "for": "2m",
+          "annotations": {
+            "summary": "Error rate above 5%",
+            "description": "API error rate has exceeded 5% threshold for 2 minutes."
+          },
+          "labels": {"severity": "warning", "team": "fuelops"},
+          "isPaused": false,
+          "notification_settings": {"receiver": "FuelOps Slack"}
+        }
+      ]
+    }
+  ]
+}
