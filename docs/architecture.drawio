@@ -1,0 +1,44 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="FuelOps Architecture">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <!-- Layer 1: CI/CD -->
+        <mxCell id="2" value="GitLab Repo" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="40" y="80" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="3" value="6-Stage Pipeline" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="200" y="80" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="4" value="Azure Container Registry" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="380" y="80" width="160" height="40" as="geometry"/></mxCell>
+        <mxCell id="5" value="Container Apps" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="580" y="80" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="2" target="3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="3" target="4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="4" target="5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Layer 2: Data -->
+        <mxCell id="6" value="Raw Data (CSV/API)" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="40" y="200" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="7" value="Bronze Table&#xa;(Append-only)" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="220" y="200" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="8" value="Silver Table&#xa;(Cleaned)" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="380" y="200" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="9" value="Gold Table&#xa;(Features)" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="540" y="200" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="6" target="7" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="7" target="8" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="8" target="9" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Layer 3: ML -->
+        <mxCell id="10" value="XGBoost Training&#xa;(4 markets)" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="540" y="320" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="11" value="MLflow Registry&#xa;Champion/Challenger" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="720" y="320" width="160" height="40" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="9" target="10" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="10" target="11" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Layer 4: Serving -->
+        <mxCell id="12" value="Batch Scoring&#xa;Databricks+Airflow" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="620" y="440" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="13" value="FastAPI&#xa;Container Apps" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="800" y="440" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="11" target="12" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="11" target="13" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Layer 5: Observability -->
+        <mxCell id="14" value="Azure Managed&#xa;Prometheus" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="800" y="560" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="15" value="Azure Managed&#xa;Grafana" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="980" y="560" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="16" value="Slack Alerts" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="1160" y="560" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="13" target="14" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="14" target="15" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="15" target="16" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Terraform -->
+        <mxCell id="17" value="Terraform&#xa;(all resources)" style="rounded=1;fillColor=#f0a30a;strokeColor=#BD7000;fontColor=#ffffff;" vertex="1" parent="1"><mxGeometry x="40" y="440" width="140" height="40" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
