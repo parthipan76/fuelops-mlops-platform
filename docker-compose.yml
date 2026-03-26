@@ -3,7 +3,7 @@ version: '3.8'
 x-airflow-common: &airflow-common
   #image: apache/airflow:2.9.0
   build:
-    context: ./airflow        # 👈 replace `image:` with `build:`
+    context: ./airflow        # ðŸ‘ˆ replace `image:` with `build:`
     dockerfile: Dockerfile
   environment:
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
