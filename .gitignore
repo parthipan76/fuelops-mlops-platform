@@ -35,3 +35,8 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+# Terraform state
+terraform/terraform.tfstate.d/
+terraform/.terraform/
+*.tfstate
+*.tfstate.backup
