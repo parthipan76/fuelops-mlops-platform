@@ -319,4 +319,4 @@ az keyvault purge --name kv-fuelops-dev --location eastus
 
 ---
 
-*Built by Parthipan S | MLOps Engineer | 7-Eleven | April 2026*
+*Built by Parthipan S | MLOps Engineer  | April 2026*
